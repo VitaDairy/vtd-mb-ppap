@@ -2,7 +2,9 @@ name: VTD Banana
 
 on:
   repository_dispatch:
-    types: [vtd-trigger]
+    types:
+      - vtd-trigger
+      - v*
 
 env:
   TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
