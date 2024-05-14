@@ -245,6 +245,11 @@ jobs:
           echo "value=$(get_version_and_build_number)" >> "$GITHUB_OUTPUT"
         timeout-minutes: 1
 
+      - name: Log value
+        run: |
+          echo "Bundle identifier: ${{ steps.bundle-identifier.outputs.value }}"
+          echo "Version: ${{ steps.get-version-build-number.outputs.value  }}"
+
       - name: Create Sentry release
         uses: getsentry/action-release@v1
         if: ${{ steps.switch-case.outputs.value != 'debug' }}
