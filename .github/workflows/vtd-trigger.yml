@@ -17,198 +17,198 @@ env:
   TRIGGERING_ACTOR: ${{ github.event.client_payload.triggering_actor}}
 
 jobs:
-  # pre-deployment:
-  #   name: Pre Deployment
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     matrix: ${{ steps.set-matrix.outputs.value }}
-  #     message-information: ${{ steps.get-message-information.outputs.value }}
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-  #       with:
-  #         repository: ${{ secrets.VTD_REPOSITORY }}
-  #         token: ${{ secrets.GH_PAT }}
-  #         ref: ${{ github.event.client_payload.ref_name}}
+  pre-deployment:
+    name: Pre Deployment
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.value }}
+      message-information: ${{ steps.get-message-information.outputs.value }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ secrets.VTD_REPOSITORY }}
+          token: ${{ secrets.GH_PAT }}
+          ref: ${{ github.event.client_payload.ref_name}}
 
-  #     - name: Set matrix
-  #       id: set-matrix
-  #       run: |
-  #         MATRIX="[{\"format\":\"IPA\",\"name\":\"macos-14\"},{\"format\":\"APK\",\"name\":\"ubuntu-22.04\"}]"
-  #         if [[ "$REF_NAME" =~ "prd" ]]; then
-  #           MATRIX="[{\"format\":\"IPA\",\"name\":\"macos-14\"},{\"format\":\"APK\",\"name\":\"ubuntu-22.04\"},{\"format\":\"AAB\",\"name\":\"ubuntu-22.04\"}]"
-  #         fi
-  #         echo "value=$MATRIX" >> $GITHUB_OUTPUT
+      - name: Set matrix
+        id: set-matrix
+        run: |
+          MATRIX="[{\"format\":\"IPA\",\"name\":\"macos-14\"},{\"format\":\"APK\",\"name\":\"ubuntu-22.04\"}]"
+          if [[ "$REF_NAME" =~ "prd" ]]; then
+            MATRIX="[{\"format\":\"IPA\",\"name\":\"macos-14\"},{\"format\":\"APK\",\"name\":\"ubuntu-22.04\"},{\"format\":\"AAB\",\"name\":\"ubuntu-22.04\"}]"
+          fi
+          echo "value=$MATRIX" >> $GITHUB_OUTPUT
 
-  #     - name: Generate message
-  #       id: get-message-information
-  #       run: |
-  #         source .github/scripts/utils.sh
-  #         echo "value=$(get_message_information)" >> "$GITHUB_OUTPUT"
-  #       timeout-minutes: 1
+      - name: Generate message
+        id: get-message-information
+        run: |
+          source .github/scripts/utils.sh
+          echo "value=$(get_message_information)" >> "$GITHUB_OUTPUT"
+        timeout-minutes: 1
 
-  #     - name: Log value
-  #       run: |
-  #         echo "tag-source: $REF_NAME"
-  #         echo "matrix: ${{ steps.set-matrix.outputs.value }}"
-  #         echo "message-information: ${{ steps.get-message-information.outputs.value }}"
+      - name: Log value
+        run: |
+          echo "tag-source: $REF_NAME"
+          echo "matrix: ${{ steps.set-matrix.outputs.value }}"
+          echo "message-information: ${{ steps.get-message-information.outputs.value }}"
 
-  #     - name: Send telegram message
-  #       uses: PacificPromise/macos-telegram-action@main
-  #       with:
-  #         type: topic
-  #         message: "🎬 -  Start: ${{ steps.get-message-information.outputs.value }}"
+      - name: Send telegram message
+        uses: PacificPromise/macos-telegram-action@main
+        with:
+          type: topic
+          message: "🎬 -  Start: ${{ steps.get-message-information.outputs.value }}"
 
-  #     - name: Send message failure
-  #       if: failure()
-  #       uses: PacificPromise/macos-telegram-action@main
-  #       with:
-  #         type: topic
-  #         message: "💥 - Failure ${{ steps.get-message-information.outputs.value }}"
+      - name: Send message failure
+        if: failure()
+        uses: PacificPromise/macos-telegram-action@main
+        with:
+          type: topic
+          message: "💥 - Failure ${{ steps.get-message-information.outputs.value }}"
 
-  # deploy:
-  #   continue-on-error: true
-  #   strategy:
-  #     fail-fast: true
-  #     matrix:
-  #       include: ${{ fromJson(needs.pre-deployment.outputs.matrix) }}
-  #   runs-on: ${{ matrix.name }}
-  #   needs: [pre-deployment]
-  #   timeout-minutes: 60
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-  #       with:
-  #         repository: ${{ secrets.VTD_REPOSITORY }}
-  #         token: ${{ secrets.GH_PAT }}
-  #         ref: ${{ github.event.client_payload.ref_name}}
+  deploy:
+    continue-on-error: true
+    strategy:
+      fail-fast: true
+      matrix:
+        include: ${{ fromJson(needs.pre-deployment.outputs.matrix) }}
+    runs-on: ${{ matrix.name }}
+    needs: [pre-deployment]
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ secrets.VTD_REPOSITORY }}
+          token: ${{ secrets.GH_PAT }}
+          ref: ${{ github.event.client_payload.ref_name}}
 
-  #     # Setup environment
-  #     - uses: ruby/setup-ruby@v1
-  #       with:
-  #         ruby-version: "3.2.2"
-  #         bundler-cache: true
+      # Setup environment
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2.2"
+          bundler-cache: true
 
-  #     - name: Setup flutter 3.13.2
-  #       uses: subosito/flutter-action@v2
-  #       with:
-  #         flutter-version: "3.13.2"
-  #         channel: "stable"
-  #     - run: flutter --version
+      - name: Setup flutter 3.13.2
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.13.2"
+          channel: "stable"
+      - run: flutter --version
 
-  #     - name: Set up JDK 17
-  #       uses: actions/setup-java@v4
-  #       if: matrix.format != 'IPA'
-  #       with:
-  #         java-version: "17"
-  #         distribution: "temurin"
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        if: matrix.format != 'IPA'
+        with:
+          java-version: "17"
+          distribution: "temurin"
 
-  #     - name: Setup Android SDK
-  #       if: matrix.format != 'IPA'
-  #       uses: android-actions/setup-android@v3
+      - name: Setup Android SDK
+        if: matrix.format != 'IPA'
+        uses: android-actions/setup-android@v3
 
-  #     - name: setup-cocoapods
-  #       if: matrix.format == 'IPA'
-  #       uses: maxim-lobanov/setup-cocoapods@v1
-  #       with:
-  #         version: 1.14.3
+      - name: setup-cocoapods
+        if: matrix.format == 'IPA'
+        uses: maxim-lobanov/setup-cocoapods@v1
+        with:
+          version: 1.14.3
 
-  #     - name: Setup gem
-  #       run: bundle install
+      - name: Setup gem
+        run: bundle install
 
-  #     # Running
-  #     - name: Change version, build number and config environment
-  #       run: bash .github/scripts/change_version_and_build_number.sh && bash .github/scripts/config_environment.sh
+      # Running
+      - name: Change version, build number and config environment
+        run: bash .github/scripts/change_version_and_build_number.sh && bash .github/scripts/config_environment.sh
 
-  #     - name: Clean and install libs
-  #       run: flutter clean && flutter pub get
+      - name: Clean and install libs
+        run: flutter clean && flutter pub get
 
-  #     - name: Generate launcher icon
-  #       run: flutter pub run flutter_launcher_icons:main
+      - name: Generate launcher icon
+        run: flutter pub run flutter_launcher_icons:main
 
-  #     - name: Build APK
-  #       if: matrix.format == 'APK'
-  #       run: flutter build apk
+      - name: Build APK
+        if: matrix.format == 'APK'
+        run: flutter build apk
 
-  #     - name: Build AAB
-  #       if: matrix.format == 'AAB'
-  #       run: flutter build appbundle
+      - name: Build AAB
+        if: matrix.format == 'AAB'
+        run: flutter build appbundle
 
-  #     - name: Cache Primes
-  #       if: matrix.format == 'IPA'
-  #       id: cache-primes
-  #       uses: actions/cache@v4
-  #       with:
-  #         path: |
-  #           ios/Pods
-  #           ios/Podfile.lock
-  #         key: vtd-cache-pods-${{ hashFiles('pubspec.lock') }}
+      - name: Cache Primes
+        if: matrix.format == 'IPA'
+        id: cache-primes
+        uses: actions/cache@v4
+        with:
+          path: |
+            ios/Pods
+            ios/Podfile.lock
+          key: vtd-cache-pods-${{ hashFiles('pubspec.lock') }}
 
-  #     - name: Pod install
-  #       if: ${{ (matrix.format == 'IPA') && (steps.cache-primes.outputs.cache-hit != 'true') }}
-  #       working-directory: ios
-  #       run: pod install
+      - name: Pod install
+        if: ${{ (matrix.format == 'IPA') && (steps.cache-primes.outputs.cache-hit != 'true') }}
+        working-directory: ios
+        run: pod install
 
-  #     - name: Install certificate and provision
-  #       if: matrix.format == 'IPA'
-  #       run: |
-  #         # create variables
-  #         CERTIFICATE_PATH=$GITHUB_WORKSPACE/.github/scripts/data/certificates/distribution.p12
-  #         PP_PATH=$GITHUB_WORKSPACE/.github/scripts/data/provisions
-  #         KEYCHAIN_PATH=$GITHUB_WORKSPACE/.github/scripts/data/certificates/app-signing.keychain-db
+      - name: Install certificate and provision
+        if: matrix.format == 'IPA'
+        run: |
+          # create variables
+          CERTIFICATE_PATH=$GITHUB_WORKSPACE/.github/scripts/data/certificates/distribution.p12
+          PP_PATH=$GITHUB_WORKSPACE/.github/scripts/data/provisions
+          KEYCHAIN_PATH=$GITHUB_WORKSPACE/.github/scripts/data/certificates/app-signing.keychain-db
 
-  #         # create temporary keychain
-  #         security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-  #         security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
-  #         security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          # create temporary keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
 
-  #         # import certificate to keychain
-  #         security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
-  #         security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-  #         security list-keychain -d user -s $KEYCHAIN_PATH
+          # import certificate to keychain
+          security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security list-keychain -d user -s $KEYCHAIN_PATH
 
-  #         # apply provisioning profile
-  #         mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-  #         cp $PP_PATH/* ~/Library/MobileDevice/Provisioning\ Profiles
+          # apply provisioning profile
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp $PP_PATH/* ~/Library/MobileDevice/Provisioning\ Profiles
 
-  #     - name: Build ipa
-  #       if: matrix.format == 'IPA'
-  #       run: flutter build ipa --release  --export-options-plist ios/export.plist
+      - name: Build ipa
+        if: matrix.format == 'IPA'
+        run: flutter build ipa --release  --export-options-plist ios/export.plist
 
-  #     # Deployment
-  #     - name: Upload APK to Firebase
-  #       if: matrix.format == 'APK'
-  #       uses: maierj/fastlane-action@v3.1.0
-  #       with:
-  #         lane: "android beta"
+      # Deployment
+      - name: Upload APK to Firebase
+        if: matrix.format == 'APK'
+        uses: maierj/fastlane-action@v3.1.0
+        with:
+          lane: "android beta"
 
-  #     - name: Upload APK open testing Playstore
-  #       if: ${{ (matrix.format == 'APK') && contains(env.REF_NAME, 'prd') }}
-  #       uses: maierj/fastlane-action@v3.1.0
-  #       with:
-  #         lane: "android upload_to_open_testing_play_store"
+      - name: Upload APK open testing Playstore
+        if: ${{ (matrix.format == 'APK') && contains(env.REF_NAME, 'prd') }}
+        uses: maierj/fastlane-action@v3.1.0
+        with:
+          lane: "android upload_to_open_testing_play_store"
 
-  #     - name: Deploy ipa
-  #       if: matrix.format == 'IPA'
-  #       uses: maierj/fastlane-action@v3.1.0
-  #       with:
-  #         lane: "ios beta"
+      - name: Deploy ipa
+        if: matrix.format == 'IPA'
+        uses: maierj/fastlane-action@v3.1.0
+        with:
+          lane: "ios beta"
 
-  #     - name: Send telegram message
-  #       uses: PacificPromise/macos-telegram-action@main
-  #       with:
-  #         type: topic
-  #         message: "✅ - Buid Success ${{ matrix.format }}: ${{ needs.pre-deployment.outputs.message-information }}"
+      - name: Send telegram message
+        uses: PacificPromise/macos-telegram-action@main
+        with:
+          type: topic
+          message: "✅ - Buid Success ${{ matrix.format }}: ${{ needs.pre-deployment.outputs.message-information }}"
 
-  #     - name: Send message failure
-  #       if: failure()
-  #       uses: PacificPromise/macos-telegram-action@main
-  #       with:
-  #         type: topic
-  #         message: "💥 - Failure ${{ matrix.format }}: ${{ needs.pre-deployment.outputs.message-information }}"
+      - name: Send message failure
+        if: failure()
+        uses: PacificPromise/macos-telegram-action@main
+        with:
+          type: topic
+          message: "💥 - Failure ${{ matrix.format }}: ${{ needs.pre-deployment.outputs.message-information }}"
 
   after-deployment:
-    # needs: [deploy]
+    needs: [deploy]
     name: After Deployment
     runs-on: ubuntu-latest
     steps:
