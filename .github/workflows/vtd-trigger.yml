@@ -238,3 +238,4 @@ jobs:
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         with:
           environment: steps.switch-case.outputs.value
+          version: ${{ env.REF_NAME }}
