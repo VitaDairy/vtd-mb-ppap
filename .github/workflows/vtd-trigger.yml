@@ -219,19 +219,9 @@ jobs:
           token: ${{ secrets.GH_PAT }}
           ref: ${{ github.event.client_payload.ref_name}}
 
-      - name: Change version, build number and config environment
-        run: bash .github/scripts/change_version_and_build_number.sh && bash .github/scripts/config_environment.sh
-
-      - name: Get bundle identifier
-        id: bundle-identifier
-        run: |
-          cd ios 
-          BUNDLE_IDENTIFIER=`xcodebuild -showBuildSettings | grep PRODUCT_BUNDLE_IDENTIFIER | sed -e 's/^[ \t]*PRODUCT_BUNDLE_IDENTIFIER =[ \t]*//'`
-          echo "value=$BUNDLE_IDENTIFIER" >> "$GITHUB_OUTPUT"
-
       - name: Get environment full
         uses: dkershner6/switch-case-action@v1
-        id: switch-case
+        id: get-environment
         with:
           default: "debug"
           conditionals-with-values: |
@@ -240,16 +230,16 @@ jobs:
             ${{ contains(env.REF_NAME, 'dev') }} => development
 
       - name: Get version and build number
-        id: get-version-build-number
+        id: get-version-sentry
         run: |
           source .github/scripts/utils.sh
-          echo "value=$(get_version_and_build_number)" >> "$GITHUB_OUTPUT"
+          echo "value=$(get_sentry_version)" >> "$GITHUB_OUTPUT"
         timeout-minutes: 1
 
       - name: Log value
         run: |
-          echo "Bundle identifier: ${{ steps.bundle-identifier.outputs.value }}"
-          echo "Version: ${{ steps.get-version-build-number.outputs.value  }}"
+          echo "Bundle identifier: ${{ steps.get-environment.outputs.value }}"
+          echo "Version: ${{ steps.get-version-sentry.outputs.value  }}"
 
       - name: Create Sentry release
         uses: getsentry/action-release@v1
@@ -259,5 +249,5 @@ jobs:
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         with:
-          environment: ${{ steps.switch-case.outputs.value }}
-          version: ${{ steps.bundle-identifier.outputs.value }}@${{ steps.get-version-build-number.outputs.value }}
+          environment: ${{ steps.get-environment.outputs.value }}
+          version: ${{ steps.get-version-sentry.outputs.value }}
