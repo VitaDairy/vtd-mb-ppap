@@ -229,6 +229,13 @@ jobs:
             ${{ contains(env.REF_NAME, 'stg') }} => echo 'staging'
             ${{ contains(env.REF_NAME, 'dev') }} => echo 'development'
 
+      - name: Get version and build number
+        id: get-version-build-number
+        run: |
+          source .github/scripts/utils.sh
+          echo "value=$(get_version_and_build_number)" >> "$GITHUB_OUTPUT"
+        timeout-minutes: 1
+
       - name: Create Sentry release
         uses: getsentry/action-release@v1
         if: ${{ steps.switch-case.outputs.value != 'debug' }}
@@ -237,5 +244,5 @@ jobs:
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         with:
-          environment: steps.switch-case.outputs.value
-          version: ${{ env.REF_NAME }}
+          environment: ${{ steps.switch-case.outputs.value }}
+          version: ${{ steps.get-version-build-number.outputs.value }}
