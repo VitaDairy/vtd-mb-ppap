@@ -225,9 +225,9 @@ jobs:
         with:
           default: "debug"
           conditionals-with-values: |
-            ${{ contains(env.REF_NAME, 'prd') }} => echo 'production'
-            ${{ contains(env.REF_NAME, 'stg') }} => echo 'staging'
-            ${{ contains(env.REF_NAME, 'dev') }} => echo 'development'
+            ${{ contains(env.REF_NAME, 'prd') }} => production
+            ${{ contains(env.REF_NAME, 'stg') }} => staging
+            ${{ contains(env.REF_NAME, 'dev') }} => development
 
       - name: Get version and build number
         id: get-version-build-number
