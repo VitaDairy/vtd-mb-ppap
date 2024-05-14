@@ -49,9 +49,9 @@ jobs:
 
       - name: Log value
         run: |
-          echo tag-source: $REF_NAME
-          echo matrix: ${{ steps.set-matrix.outputs.value }}
-          echo message-information: ${{ steps.get-message-information.outputs.value }}
+          echo "tag-source: $REF_NAME"
+          echo "matrix: ${{ steps.set-matrix.outputs.value }}"
+          echo "message-information: ${{ steps.get-message-information.outputs.value }}"
 
       - name: Send telegram message
         uses: PacificPromise/macos-telegram-action@main
