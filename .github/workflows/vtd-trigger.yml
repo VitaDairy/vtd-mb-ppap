@@ -226,7 +226,8 @@ jobs:
         id: bundle-identifier
         run: |
           cd ios 
-          echo "value=$(xcodebuild -showBuildSettings | grep PRODUCT_BUNDLE_IDENTIFIER | sed -e 's/^[ \t]*PRODUCT_BUNDLE_IDENTIFIER =[ \t]*//')" >> "$GITHUB_OUTPUT"
+          BUNDLE_IDENTIFIER=`xcodebuild -showBuildSettings | grep PRODUCT_BUNDLE_IDENTIFIER | sed -e 's/^[ \t]*PRODUCT_BUNDLE_IDENTIFIER =[ \t]*//'`
+          echo "value=$BUNDLE_IDENTIFIER" >> "$GITHUB_OUTPUT"
 
       - name: Get environment full
         uses: dkershner6/switch-case-action@v1
