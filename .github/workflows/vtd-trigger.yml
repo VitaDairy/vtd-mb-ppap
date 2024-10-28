@@ -184,7 +184,10 @@ jobs:
 
       - name: Fix wakelock_plus
         if: matrix.format == 'IPA'
-        run: rm -rf ios/Pods/Target\ Support\ Files/wakelock_plus/wakelock_plus-umbrella.h && cp .github/bak/wakelock_plus-umbrella.h ios/Pods/Target\ Support\ Files/wakelock_plus/wakelock_plus-umbrella.h
+        run: |
+          rm -rf ios/Pods/Target\ Support\ Files/wakelock_plus/wakelock_plus-umbrella.h 
+          cp .github/bak/wakelock_plus-umbrella.h ios/Pods/Target\ Support\ Files/wakelock_plus/
+          cat ios/Pods/Target\ Support\ Files/wakelock_plus/wakelock_plus-umbrella.h
 
       - name: Build ipa
         if: matrix.format == 'IPA'
