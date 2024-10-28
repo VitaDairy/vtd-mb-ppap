@@ -9,5 +9,8 @@ jobs:
     name: Test
     runs-on: macos-14
     steps:
-      - name: Checkout
+      - name: List apps
+        run: ls -l /Applications
+
+      - name: Run Test
         run: xcode-select --switch /Applications/Xcode_15.4.app/Contents/Developer
