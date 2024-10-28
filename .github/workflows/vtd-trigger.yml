@@ -171,6 +171,12 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH/* ~/Library/MobileDevice/Provisioning\ Profiles
 
+      - name: Select Xcode
+        if: matrix.format == 'IPA'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "15.4"
+
       - name: Build ipa
         if: matrix.format == 'IPA'
         run: flutter build ipa --release  --export-options-plist ios/export.plist
