@@ -140,19 +140,18 @@ jobs:
         if: matrix.format == 'AAB'
         run: flutter build appbundle
 
-      # - name: Cache Primes
-      #   if: matrix.format == 'IPA'
-      #   id: cache-primes
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: |
-      #       ios/Pods
-      #       ios/Podfile.lock
-      #     key: vtd-cache-pods-${{ hashFiles('pubspec.lock') }}
+      - name: Cache Primes
+        if: matrix.format == 'IPA'
+        id: cache-primes
+        uses: actions/cache@v4
+        with:
+          path: |
+            ios/Pods
+            ios/Podfile.lock
+          key: vtd-cache-pods-${{ hashFiles('pubspec.lock') }}
 
       - name: Pod install
-        # if: ${{ (matrix.format == 'IPA') && (steps.cache-primes.outputs.cache-hit != 'true') }}
-        if: matrix.format == 'IPA'
+        if: ${{ (matrix.format == 'IPA') && (steps.cache-primes.outputs.cache-hit != 'true') }}
         working-directory: ios
         run: pod install
 
@@ -178,30 +177,9 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH/* ~/Library/MobileDevice/Provisioning\ Profiles
 
-      - name: Switch Xcode Command Line Tools
-        if: matrix.format == 'IPA'
-        run: sudo xcode-select --switch /Applications/Xcode_15.4.app/Contents/Developer
-
-      - name: Fix wakelock_plus
-        if: matrix.format == 'IPA'
-        run: |
-          rm -rf ios/Pods/Target\ Support\ Files/wakelock_plus/wakelock_plus-umbrella.h 
-          cp .github/bak/wakelock_plus-umbrella.h ios/Pods/Target\ Support\ Files/wakelock_plus/
-          cat ios/Pods/Target\ Support\ Files/wakelock_plus/wakelock_plus-umbrella.h
-
       - name: Build ipa
         if: matrix.format == 'IPA'
-        run: |
-          xcodebuild -workspace ios/Runner.xcworkspace \
-          -scheme Runner \
-          -configuration Release \
-          -archivePath build/Runner.xcarchive \
-          archive
-
-          xcodebuild -exportArchive \
-          -archivePath build/Runner.xcarchive \
-          -exportOptionsPlist ios/export.plist \
-          -exportPath build/
+        run: flutter build ipa --release  --export-options-plist ios/export.plist
 
       # Deployment
       - name: Upload APK to Firebase
