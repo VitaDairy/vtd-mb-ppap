@@ -148,7 +148,7 @@ jobs:
         # if: ${{ (matrix.format == 'IPA') && (steps.cache-primes.outputs.cache-hit != 'true') }}
         if: matrix.format == 'IPA'
         working-directory: ios
-        run: pod install
+        run: pod install --repo-update
 
       - name: Install certificate and provision
         if: matrix.format == 'IPA'
