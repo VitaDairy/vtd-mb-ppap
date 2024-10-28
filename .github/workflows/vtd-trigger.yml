@@ -151,7 +151,8 @@ jobs:
           key: vtd-cache-pods-${{ hashFiles('pubspec.lock') }}
 
       - name: Pod install
-        if: ${{ (matrix.format == 'IPA') && (steps.cache-primes.outputs.cache-hit != 'true') }}
+        # if: ${{ (matrix.format == 'IPA') && (steps.cache-primes.outputs.cache-hit != 'true') }}
+        if: matrix.format == 'IPA'
         working-directory: ios
         run: pod install
 
