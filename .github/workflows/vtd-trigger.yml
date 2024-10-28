@@ -191,7 +191,17 @@ jobs:
 
       - name: Build ipa
         if: matrix.format == 'IPA'
-        run: flutter build ipa --release  --export-options-plist ios/export.plist --no-codesign --no-pub
+        run: |
+          xcodebuild -workspace ios/Runner.xcworkspace \
+          -scheme Runner \
+          -configuration Release \
+          -archivePath build/Runner.xcarchive \
+          archive
+
+          xcodebuild -exportArchive \
+          -archivePath build/Runner.xcarchive \
+          -exportOptionsPlist ios/export.plist \
+          -exportPath build/
 
       # Deployment
       - name: Upload APK to Firebase
