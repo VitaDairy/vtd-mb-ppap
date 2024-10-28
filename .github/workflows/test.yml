@@ -1,0 +1,13 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  test:
+    name: Test
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        run: xcode-select --switch /Applications/Xcode_15.4.app/Contents/Developer
