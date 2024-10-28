@@ -134,21 +134,20 @@ jobs:
         if: matrix.format == 'AAB'
         run: flutter build appbundle
 
-      # - name: Cache Primes
-      #   if: matrix.format == 'IPA'
-      #   id: cache-primes
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: |
-      #       ios/Pods
-      #       ios/Podfile.lock
-      #     key: vtd-cache-pods-${{ hashFiles('pubspec.lock') }}
+      - name: Cache Primes
+        if: matrix.format == 'IPA'
+        id: cache-primes
+        uses: actions/cache@v4
+        with:
+          path: |
+            ios/Pods
+            ios/Podfile.lock
+          key: vtd-cache-pods-${{ hashFiles('pubspec.lock') }}
 
       - name: Pod install
-        # if: ${{ (matrix.format == 'IPA') && (steps.cache-primes.outputs.cache-hit != 'true') }}
-        if: matrix.format == 'IPA'
+        if: ${{ (matrix.format == 'IPA') && (steps.cache-primes.outputs.cache-hit != 'true') }}
         working-directory: ios
-        run: pod install --repo-update
+        run: pod install
 
       - name: Install certificate and provision
         if: matrix.format == 'IPA'
