@@ -53,18 +53,18 @@ jobs:
           echo "matrix: ${{ steps.set-matrix.outputs.value }}"
           echo "message-information: ${{ steps.get-message-information.outputs.value }}"
 
-      - name: Send telegram message
-        uses: PacificPromise/macos-telegram-action@main
-        with:
-          type: topic
-          message: "🎬 -  Start: ${{ steps.get-message-information.outputs.value }}"
+      # - name: Send telegram message
+      #   uses: PacificPromise/macos-telegram-action@main
+      #   with:
+      #     type: topic
+      #     message: "🎬 -  Start: ${{ steps.get-message-information.outputs.value }}"
 
-      - name: Send message failure
-        if: failure()
-        uses: PacificPromise/macos-telegram-action@main
-        with:
-          type: topic
-          message: "💥 - Failure ${{ steps.get-message-information.outputs.value }}"
+      # - name: Send message failure
+      #   if: failure()
+      #   uses: PacificPromise/macos-telegram-action@main
+      #   with:
+      #     type: topic
+      #     message: "💥 - Failure ${{ steps.get-message-information.outputs.value }}"
 
   deploy:
     continue-on-error: true
@@ -200,18 +200,18 @@ jobs:
         with:
           lane: "ios beta"
 
-      - name: Send telegram message
-        uses: PacificPromise/macos-telegram-action@main
-        with:
-          type: topic
-          message: "✅ - Buid Success ${{ matrix.format }}: ${{ needs.pre-deployment.outputs.message-information }}"
+      # - name: Send telegram message
+      #   uses: PacificPromise/macos-telegram-action@main
+      #   with:
+      #     type: topic
+      #     message: "✅ - Buid Success ${{ matrix.format }}: ${{ needs.pre-deployment.outputs.message-information }}"
 
-      - name: Send message failure
-        if: failure()
-        uses: PacificPromise/macos-telegram-action@main
-        with:
-          type: topic
-          message: "💥 - Failure ${{ matrix.format }}: ${{ needs.pre-deployment.outputs.message-information }}"
+      # - name: Send message failure
+      #   if: failure()
+      #   uses: PacificPromise/macos-telegram-action@main
+      #   with:
+      #     type: topic
+      #     message: "💥 - Failure ${{ matrix.format }}: ${{ needs.pre-deployment.outputs.message-information }}"
 
   after-deployment:
     needs: [deploy]
