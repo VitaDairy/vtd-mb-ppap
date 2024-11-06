@@ -195,7 +195,7 @@ jobs:
         with:
           timeout_minutes: 60
           max_attempts: 2
-          command: cp .github/data/backup/android/* android/ && bundle exec fastlane ${{ matrix.platform }} build_${{ matrix.format }}
+          command: bundle exec fastlane ${{ matrix.platform }} build_${{ matrix.format }}
 
       - name: Deploy ${{ matrix.format }}
         run: bundle exec fastlane ${{ matrix.platform }} deploy_${{ matrix.format }}
