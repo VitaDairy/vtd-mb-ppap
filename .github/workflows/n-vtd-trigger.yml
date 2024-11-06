@@ -158,7 +158,7 @@ jobs:
       - name: Generate launcher icon
         run: flutter pub run flutter_launcher_icons:main
 
-      - name: Cache Primes
+      - name: Check cache Pods
         if: matrix.format == 'IPA'
         id: cache-primes
         uses: actions/cache@v4
