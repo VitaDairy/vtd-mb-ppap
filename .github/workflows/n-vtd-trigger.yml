@@ -190,17 +190,12 @@ jobs:
       - name: Update version and build number
         run: bundle exec fastlane ${{ matrix.platform }} update_version_and_build_number
 
-      - name: Test
-        run: |
-          cd /home/runner/work/vtd-mb-ppap/vtd-mb-ppa && ls -la
-          cd /home/runner/work/vtd-mb-ppap/vtd-mb-ppap/android && ls -la
-
       - name: Build ${{ matrix.format }}
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: 60
           max_attempts: 2
-          command: bundle exec fastlane ${{ matrix.platform }} build_${{ matrix.format }}
+          command: cp .github/data/backup/android/* android/ && bundle exec fastlane ${{ matrix.platform }} build_${{ matrix.format }}
 
       - name: Deploy ${{ matrix.format }}
         run: bundle exec fastlane ${{ matrix.platform }} deploy_${{ matrix.format }}
