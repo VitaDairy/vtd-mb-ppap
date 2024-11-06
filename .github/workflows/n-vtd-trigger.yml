@@ -204,6 +204,9 @@ jobs:
           max_attempts: 2
           command: bundle exec fastlane ${{ matrix.platform }} build_${{ matrix.format }}
 
+      - name: Deploy ${{ matrix.format }}
+        run: bundle exec fastlane ${{ matrix.platform }} deploy_${{ matrix.format }}
+
       # Deployment
       # - name: Upload APK to Firebase
       #   if: matrix.format == 'APK'
