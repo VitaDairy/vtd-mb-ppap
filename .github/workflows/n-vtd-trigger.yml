@@ -190,6 +190,11 @@ jobs:
       - name: Update version and build number
         run: bundle exec fastlane ${{ matrix.platform }} update_version_and_build_number
 
+      - name: Test
+        run: |
+          cp .github/data/backup/android/* android/
+          cp .github/data/backup/android/gradle/wrapper/* android/gradle/wrapper/
+
       - name: Build ${{ matrix.format }}
         uses: nick-fields/retry@v3
         with:
