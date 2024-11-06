@@ -50,7 +50,7 @@ jobs:
             MATRIX="${{ toJson(env.BUILD_MATRIX_PRD) }}"
           fi
           # test ios
-          MATRIX="${{ toJson(env.BUILD_MATRIX_IOS) }}"
+          MATRIX="${{ toJson(env.BUILD_MATRIX_ANDROID) }}"
 
           echo "value=$MATRIX" >> $GITHUB_OUTPUT
 
@@ -129,6 +129,7 @@ jobs:
         with:
           ruby-version: 3.2.2
           bundler-cache: true
+      - run: bundle install
 
       - name: Setup flutter
         uses: subosito/flutter-action@v2
@@ -137,29 +138,17 @@ jobs:
           channel: "stable"
       - run: flutter --version
 
-      # - name: Set up JDK 17
-      #   uses: actions/setup-java@v4
-      #   if: matrix.format != 'IPA'
-      #   with:
-      #     java-version: "17"
-      #     distribution: "temurin"
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        if: matrix.platform == 'android'
+        with:
+          java-version: 21
+          distribution: "temurin"
+          cache: "gradle"
 
-      # - name: Setup Android SDK
-      #   if: matrix.format != 'IPA'
-      #   uses: android-actions/setup-android@v3
-
-      # - name: setup-cocoapods
-      #   if: matrix.format == 'IPA'
-      #   uses: maxim-lobanov/setup-cocoapods@v1
-      #   with:
-      #     version: 1.16.2
-
-      - name: Setup gem
-        run: bundle install
-
-      # Running
-      # - name: Change version, build number and config environment
-      #   run: bash .github/scripts/change_version_and_build_number.sh && bash .github/scripts/config_environment.sh
+      - name: Setup Android SDK
+        if: matrix.platform == 'android'
+        uses: android-actions/setup-android@v3
 
       - name: Clean and install libs
         run: flutter clean && flutter pub get
@@ -190,6 +179,13 @@ jobs:
         working-directory: ios
         run: bundle exec pod install
 
+      # - name: Cache ios deriveddata
+      #   uses: irgaly/xcode-cache@v1
+      #   if: matrix.platform == 'ios'
+      #   with:
+      #     key: xcode-cache-deriveddata-${{ env.APP_VARIANT }}-${{ github.workflow }}-${{ github.sha }}
+      #     restore-keys: xcode-cache-deriveddata-${{ env.APP_VARIANT }}-${{ github.workflow }}-
+
       - name: Install certificate and provision
         if: matrix.format == 'IPA'
         run: bundle exec fastlane ios certificates && bundle exec fastlane ios update_settings
@@ -207,37 +203,19 @@ jobs:
       - name: Deploy ${{ matrix.format }}
         run: bundle exec fastlane ${{ matrix.platform }} deploy_${{ matrix.format }}
 
-      # Deployment
-      # - name: Upload APK to Firebase
-      #   if: matrix.format == 'APK'
-      #   uses: maierj/fastlane-action@v3.1.0
-      #   with:
-      #     lane: "android beta"
+      - name: Send telegram message
+        if: vars.IS_SILENT != 'true'
+        uses: PacificPromise/macos-telegram-action@main
+        with:
+          type: topic
+          message: "✅ - Success ${{ matrix.format }}: ${{ needs.init.outputs.message-information }}"
 
-      # - name: Upload APK open testing Playstore
-      #   if: ${{ (matrix.format == 'APK') && contains(env.REF_NAME, 'prd') }}
-      #   uses: maierj/fastlane-action@v3.1.0
-      #   with:
-      #     lane: "android upload_to_open_testing_play_store"
-
-      # - name: Deploy ipa
-      #   if: matrix.format == 'IPA'
-      #   uses: maierj/fastlane-action@v3.1.0
-      #   with:
-      #     lane: "ios beta"
-
-      # - name: Send telegram message
-      #   uses: PacificPromise/macos-telegram-action@main
-      #   with:
-      #     type: topic
-      #     message: "✅ - Buid Success ${{ matrix.format }}: ${{ needs.pre-deployment.outputs.message-information }}"
-
-      # - name: Send message failure
-      #   if: failure()
-      #   uses: PacificPromise/macos-telegram-action@main
-      #   with:
-      #     type: topic
-      #     message: "💥 - Failure ${{ matrix.format }}: ${{ needs.pre-deployment.outputs.message-information }}"
+      - name: Send telegram message failure
+        if: ${{ failure() && vars.IS_SILENT != 'true' }}
+        uses: PacificPromise/macos-telegram-action@main
+        with:
+          type: topic
+          message: "💥 - Failure ${{ matrix.format }}: ${{ needs.init.outputs.message-information }}"
 
   # after-deployment:
   #   needs: [deploy]
