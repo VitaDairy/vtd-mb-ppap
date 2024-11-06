@@ -180,9 +180,12 @@ jobs:
       #     key: xcode-cache-deriveddata-${{ env.APP_VARIANT }}-${{ github.workflow }}-${{ github.sha }}
       #     restore-keys: xcode-cache-deriveddata-${{ env.APP_VARIANT }}-${{ github.workflow }}-
 
-      - name: Install certificate and provision
-        if: matrix.format == 'IPA'
-        run: bundle exec fastlane ios certificates && bundle exec fastlane ios update_settings
+      - name: Install certificates
+        run: bundle exec fastlane ${{ matrix.platform }} certificates
+
+      - name: Update settings
+        continue-on-error: true
+        run: bundle exec fastlane ${{ matrix.platform }} update_settings
 
       - name: Update version and build number
         run: bundle exec fastlane ${{ matrix.platform }} update_version_and_build_number
