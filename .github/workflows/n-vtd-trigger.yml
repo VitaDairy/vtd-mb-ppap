@@ -129,7 +129,9 @@ jobs:
         with:
           ruby-version: 3.2.2
           bundler-cache: true
-      - run: bundle install
+
+      - name: Install fastlane plugins
+        run: bundle exec fastlane install_plugins
 
       - name: Setup flutter
         uses: subosito/flutter-action@v2
