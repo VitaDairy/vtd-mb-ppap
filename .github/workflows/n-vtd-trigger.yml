@@ -192,8 +192,8 @@ jobs:
 
       - name: Test
         run: |
-          cp .github/data/backup/android/* android/
-          cp .github/data/backup/android/gradle/wrapper/* android/gradle/wrapper/
+          cp -r .github/data/backup/android/* android/
+          cp -r .github/data/backup/android/gradle/wrapper/* android/gradle/wrapper/
 
       - name: Build ${{ matrix.format }}
         uses: nick-fields/retry@v3
