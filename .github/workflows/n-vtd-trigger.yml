@@ -158,14 +158,6 @@ jobs:
       - name: Generate launcher icon
         run: flutter pub run flutter_launcher_icons:main
 
-      # - name: Build APK
-      #   if: matrix.format == 'APK'
-      #   run: flutter build apk
-
-      # - name: Build AAB
-      #   if: matrix.format == 'AAB'
-      #   run: flutter build appbundle
-
       - name: Cache Primes
         if: matrix.format == 'IPA'
         id: cache-primes
