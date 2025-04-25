@@ -34,9 +34,9 @@ jobs:
       - name: Set matrix
         id: set-matrix
         run: |
-          MATRIX="[{\"format\":\"IPA\",\"name\":\"macos-14\"},{\"format\":\"APK\",\"name\":\"ubuntu-22.04\"}]"
+          MATRIX="${{ toJson('[{"format":"ipa","name":"macos-15","platform":"ios"},{"format":"apk","name":"ubuntu-22.04","platform":"android"}]') }}"
           if [[ "$REF_NAME" =~ "prd" ]]; then
-            MATRIX="[{\"format\":\"IPA\",\"name\":\"macos-14\"},{\"format\":\"APK\",\"name\":\"ubuntu-22.04\"},{\"format\":\"AAB\",\"name\":\"ubuntu-22.04\"}]"
+            MATRIX="${{ toJson('[{"format":"ipa","name":"macos-15","platform":"ios"},{"format":"apk","name":"ubuntu-22.04","platform":"android"},{"format":"aab","name":"ubuntu-22.04","platform":"android"}]') }}"
           fi
           echo "value=$MATRIX" >> $GITHUB_OUTPUT
 
