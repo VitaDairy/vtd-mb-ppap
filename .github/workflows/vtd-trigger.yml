@@ -171,15 +171,15 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH/* ~/Library/MobileDevice/Provisioning\ Profiles
 
-      - name: Build ipa
-        if: matrix.format == 'IPA'
-        run: flutter build ipa --release  --export-options-plist ios/export.plist
-
       # - name: Build ipa
       #   if: matrix.format == 'IPA'
-      #   uses: maierj/fastlane-action@v3.1.0
-      #   with:
-      #     lane: "ios build_ipa"
+      #   run: flutter build ipa --release  --export-options-plist ios/export.plist
+
+      - name: Build ipa
+        if: matrix.format == 'IPA'
+        uses: maierj/fastlane-action@v3.1.0
+        with:
+          lane: "ios build_ipa"
 
       # Deployment
       - name: Upload APK to Firebase
