@@ -111,7 +111,7 @@ jobs:
         if: matrix.format == 'IPA'
         uses: maxim-lobanov/setup-cocoapods@v1
         with:
-          version: 1.14.3
+          version: 1.16.2
 
       - name: Setup gem
         run: bundle install
