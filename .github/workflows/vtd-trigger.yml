@@ -147,7 +147,7 @@ jobs:
       - name: Pod install
         if: ${{ (matrix.format == 'IPA') && (steps.cache-primes.outputs.cache-hit != 'true') }}
         working-directory: ios
-        run: pod install
+        run: pod deintegrate && pod install
 
       - name: Install certificate and provision
         if: matrix.format == 'IPA'
