@@ -171,6 +171,10 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH/* ~/Library/MobileDevice/Provisioning\ Profiles
 
+      - name: Switch xcode version
+        if: matrix.format == 'IPA'
+        run: sudo xcode-select --switch /Applications/Xcode_16.4.app
+
       - name: Build ipa
         if: matrix.format == 'IPA'
         run: flutter build ipa --release  --export-options-plist ios/export.plist
